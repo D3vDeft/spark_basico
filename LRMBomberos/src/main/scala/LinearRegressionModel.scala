@@ -58,15 +58,13 @@ object LinearRegressionModel {
 
     // Seleccionar columnas finales para el modelo
     val dfSelected = encoded.select(
-      "DISTRITO","TOTAL","DISTRITO_encoded", "FUEGOS_encoded", "DAÑOS EN CONSTRUCCION_encoded", "SALVAMENTOS Y RESCATES_encoded",
-      "DAÑOS POR AGUA_encoded", "INCIDENTES DIVERSOS_encoded", "SALIDAS SIN INTERVENCION_encoded", "SERVICIOS VARIOS_encoded", "TOTAL_index"
+      "DISTRITO", "TOTAL", "DISTRITO_encoded", "FUEGOS"
     )
 
     // Ensamblar todas las características en un solo vector
     val assembler = new VectorAssembler()
       .setInputCols(Array(
-        "DISTRITO_encoded", "FUEGOS_encoded", "DAÑOS EN CONSTRUCCION_encoded", "SALVAMENTOS Y RESCATES_encoded",
-        "DAÑOS POR AGUA_encoded", "INCIDENTES DIVERSOS_encoded", "SALIDAS SIN INTERVENCION_encoded", "SERVICIOS VARIOS_encoded", "TOTAL_index"
+         "DISTRITO_encoded", "FUEGOS","TOTAL"
       ))
       .setOutputCol("features")
 
@@ -77,7 +75,7 @@ object LinearRegressionModel {
 
     // Instanciar el modelo de regresión lineal
     val lr = new LinearRegression()
-      .setLabelCol("TOTAL_index") // La columna label para regresión lineal
+      .setLabelCol("FUEGOS") // La columna label para regresión lineal
       .setFeaturesCol("features") // La columna features que contiene el vector ensamblado
 
     // Entrenar el modelo de regresión lineal
@@ -88,7 +86,7 @@ object LinearRegressionModel {
 
     // Evaluar el modelo utilizando el evaluador de regresión
     val evaluator = new RegressionEvaluator()
-      .setLabelCol("TOTAL_index") // La columna label para evaluar
+      .setLabelCol("FUEGOS") // La columna label para evaluar
       .setPredictionCol("prediction") // La columna de predicción a evaluar
       .setMetricName("rmse") // Raíz del error cuadrático medio (RMSE)
 
@@ -102,7 +100,7 @@ object LinearRegressionModel {
 
 
     predictions
-      .select("DISTRITO","TOTAL","TOTAL_index", "prediction")
+      .select("DISTRITO", "FUEGOS" ,"TOTAL", "prediction")
       .write
       .option("header", "true")
       .csv(outputPath)
