@@ -87,25 +87,19 @@ object Estadistica {
 
     val predictions = lrModel.transform(testData)
 
-
-    val vectorToString = udf((vector: Vector) => vector.toArray.mkString("[", ", ", "]"))
-
-    val predictionsWithReadableFeatures = lrModel.transform(testData)
-      .withColumn("features_readable", vectorToString(col("features")))
-
-    predictionsWithReadableFeatures.select("features_readable", "label", "prediction").show()
-
     val evaluator = new RegressionEvaluator()
       .setLabelCol("label")
       .setPredictionCol("prediction")
       .setMetricName("rmse") // Raíz del error cuadrático medio
 
+    predictions.show()
+
     val rmse = evaluator.evaluate(predictions)
     println(s"Root Mean Squared Error (RMSE) on test data = $rmse")
 
     val outputFilePath = "src/source/prediction_folder"
-    predictionsWithReadableFeatures
-      .select("features_readable", "label", "prediction")
+    predictions
+      .select("distrito","positiva_alcohol", "prediction")
       .write
       .option("header", "true")
       .csv(outputFilePath)
